@@ -1,0 +1,20 @@
+<!--
+Create tabs with an icon and label, using the tabs-positive style.
+Each tab's child <ion-nav-view> directive will have its own
+navigation history that also transitions its views in and out.
+-->
+<ion-tabs class="tabs-icon-top tabs-color-active-positive">
+
+
+  <!-- Current Location Tab -->
+  <ion-tab title="Location" icon-off="ion-pin" icon-on="ion-pin" href="#/tab/location">
+    <ion-nav-view name="tab-location"></ion-nav-view>
+  </ion-tab>
+
+
+  <!-- Photos Tab -->
+  <ion-tab title="Camera" icon-off="ion-camera" icon-on="ion-camera" href="#/tab/camera">
+    <ion-nav-view name="tab-camera"></ion-nav-view>
+  </ion-tab>
+
+</ion-tabs>

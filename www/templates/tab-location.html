@@ -1,0 +1,22 @@
+<ion-view view-title="Current Location Example">
+  <ion-content class="padding">
+    <div class="list card">
+      <div class="item item-divider">Get Your Current Location!</div>
+      <div class="item item-body">
+        <div>
+          <button type="button" class="button button-block button-positive" ng-click="getCurrentLocation()">
+            Get Location!
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="list card">
+      <div class="item item-divider">Your Location</div>
+      <div class="item item-body">
+        <div class="current-location-info">
+          {{locationString}}
+        </div>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>
