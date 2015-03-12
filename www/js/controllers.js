@@ -4,8 +4,8 @@ angular.module('starter.controllers', [])
 
   // PLEASE NOTE:  you must install the apache cordova geolocation plugin for this to function.
   // You can install it with the following command:  ionic plugin add org.apache.cordova.geolocation
-
-  $scope.locationString = "Please click the button above to get your location.";
+  $scope.data = {};
+  $scope.data.locationString = "Please click the button above to get your location.";
 
   // this function is bound to the button on the location page which gets the current location
   $scope.getCurrentLocation = function() {
@@ -22,24 +22,26 @@ angular.module('starter.controllers', [])
         // get the latitude and longitude and create a string displaying everything
         var lat = position.coords.latitude;
         var lng = position.coords.longitude;
-        $scope.locationString = 'Your current location is... Latitude: '+lat+' and Longitude: '+lng;
+        $scope.data.locationString = 'Your current location is... Latitude: '+lat+' and Longitude: '+lng;
         $state.go('tab.location');
       });
     } else {
-      $scope.locationString = "Sorry, but the computer Gremlins struck again!  Yell at Rob!";
+      $scope.data.locationString = "Sorry, but the computer Gremlins struck again!  Yell at Rob!";
       $state.go('tab.location');
     }
     
   }
 })
 
-.controller('CameraCtrl', function($scope, $state) {
+.controller('CameraCtrl', function($scope, $state, $http) {
 
   // PLEASE NOTE:  you must install the apache cordova camera plugin for this to function.
   // You can install it with the following command:  ionic plugin add org.apache.cordova.camera
 
+  $scope.data = {};
+
   // set the default image URI (a color bar image)
-  $scope.imageURI = 'http://www.dvinfo.net/forum/attachments/view-video-display-hardware-software/4853d1193613730-smpte-color-bars-bars_pal.jpg';
+  $scope.data.imageURI = 'http://www.dvinfo.net/forum/attachments/view-video-display-hardware-software/4853d1193613730-smpte-color-bars-bars_pal.jpg';
 
   // the takePhoto function attached to the button
   $scope.takePhoto = function() {
@@ -48,21 +50,53 @@ angular.module('starter.controllers', [])
     // for the complete list
     var cameraOptions = {
       targetWidth: 300,
-      targetHeight: 300
+      targetHeight: 300,
+      destinationType: 0
     };
 
     // perform the api call to take the picture.  
     // The success function has a URI containing the file location on the phone of the image
     // The error function sends an alert that an issue has occured
     // The cameraOptions are defined above
-    navigator.camera.getPicture(function(imageURI) {
+    navigator.camera.getPicture(function(data) {
       
-      $scope.imageURI = imageURI;
+      // We need to encode the returned data in this way so that it can be displayed on the phone as raw data
+      // instead of a URL
+      $scope.data.imageURI = "data:image/jpeg;base64,"+data;
       $state.go('tab.camera');
 
     }, function(err) {
 
       alert("Oops!  Can't take your photo!  Either you backed out before saving a photo, or you are not on a device.  Camera will not work from the emulator...");
     }, cameraOptions);
+  }
+
+  // save the photo via API
+  $scope.savePhoto = function() {
+
+    // determine if an image has actually been taken
+    if ($scope.data.imageURI.match(/^data:image\/jpeg;base64,/)) {
+
+      // post the image to the api
+      // NOTE: in order to access the image on the API side, execute the following to save in main folder:
+      //
+      //
+      //  var base64Data = req.body.image.replace(/^data:image\/jpeg;base64,/, "");
+      //  require("fs").writeFile("test.jpg", base64Data, 'base64', function(err) {
+      //    console.log(err);
+      //  });
+      $http.post("http://YOUR_API_URL/upload", { image: $scope.data.imageURI }).then(function(result) {
+
+          // for the purposes of my example, I was just returning a message.  Alter however you want your
+          // successful returned call to work
+          alert(result.data.message);
+      }, function(error) {
+          alert("There was a problem saving your image.  Check the logs for details.");
+          console.log(error);
+      });
+    }
+    else {
+      alert("You need to take a photo first!");
+    }
   }
 });
