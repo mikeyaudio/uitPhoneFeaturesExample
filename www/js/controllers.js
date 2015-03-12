@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('LocationCtrl', function($scope, $state) {
+.controller('LocationCtrl', function($scope, $state, $http) {
 
   // PLEASE NOTE:  you must install the apache cordova geolocation plugin for this to function.
   // You can install it with the following command:  ionic plugin add org.apache.cordova.geolocation
@@ -22,8 +22,19 @@ angular.module('starter.controllers', [])
         // get the latitude and longitude and create a string displaying everything
         var lat = position.coords.latitude;
         var lng = position.coords.longitude;
-        $scope.data.locationString = 'Your current location is... Latitude: '+lat+' and Longitude: '+lng;
-        $state.go('tab.location');
+
+        //use the Google Maps Geocoder API to reverse geocode and get the address
+        $http.get("https://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+lng+"&key=YOUR_GOOGLE_API_KEY").then(function(result) {
+
+            // update the address variable with the formatted address and print the lat and lng.
+            // for an example of the output in result.data, please see:
+            // http://maps.googleapis.com/maps/api/geocode/json?latlng=51.187296,1.229086&sensor=false&_=1302084865163
+            $scope.data.locationString = 'Your current location is... Latitude: '+lat+' and Longitude: '+lng+', and your address is '+result.data.results[0].formatted_address;
+            $state.go('tab.location');
+        }, function(error) {
+            alert("Couldn't geocode.  Check the logs for details.");
+            console.log(error);
+        });
       });
     } else {
       $scope.data.locationString = "Sorry, but the computer Gremlins struck again!  Yell at Rob!";
